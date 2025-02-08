@@ -1,6 +1,7 @@
 package main
 
 import (
+	messaging "backend/amqp"
 	"backend/httpserver"
 	"backend/logging"
 	"log"
@@ -9,5 +10,6 @@ import (
 func main() {
 	logging.ConfigureLogger()
 	log.Println("Starting...")
-	httpserver.Serve()
+	go httpserver.Serve()
+	messaging.ServeRabbit()
 }

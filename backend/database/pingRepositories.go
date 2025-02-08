@@ -13,10 +13,10 @@ func (pingRepository *PingRepository) AddService(address string) {
 	newService := PingedServices{Address: address}
 	pingRepository.pingConnection.Create(&newService)
 }
-func (pingRepository *PingRepository) AddPingByAddress(address string, date time.Time) {
+func (pingRepository *PingRepository) AddPingByAddress(address string, date time.Time, state bool) {
 	var service PingedServices
 	pingRepository.pingConnection.Where("address = ?", address).Take(&service)
-	newPing := Ping{Date: date, ServiceId: service.ID}
+	newPing := Ping{Date: date, ServiceId: service.ID, State: state}
 	pingRepository.pingConnection.Create(&newPing)
 }
 func (pingRepository *PingRepository) GetLastPing(address string) Ping {

@@ -1,8 +1,9 @@
 package httpserver
 
 import (
+	messaging "backend/amqp"
 	"backend/database"
-	"backend/httpserver/transfer"
+	"backend/transfer"
 	"encoding/json"
 	"log"
 	"net/http"
@@ -70,6 +71,7 @@ func addService(w http.ResponseWriter, r *http.Request) {
 	} else {
 		repo := database.GetPingRepository()
 		repo.AddService(address)
+		messaging.SendToAddService(address)
 		w.WriteHeader(http.StatusOK)
 	}
 }

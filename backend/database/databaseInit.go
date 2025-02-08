@@ -37,7 +37,7 @@ func connectPingDatabase() *gorm.DB {
 			if err != nil {
 				retryTimes = 5
 			}
-			log.Printf("Retry in %ds\n", retryTimes)
+			log.Printf("Retry connecting to Database in %ds\n", retryTimes)
 			time.Sleep(time.Duration(retryTimes) * time.Second)
 		} else {
 			res = con
