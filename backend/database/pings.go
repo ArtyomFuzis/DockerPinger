@@ -8,6 +8,7 @@ import (
 type Ping struct {
 	gorm.Model
 	ServiceId uint
+	State     bool
 	Date      time.Time `gorm:"sort:desc"`
 }
 

@@ -18,6 +18,5 @@ func Serve() {
 	}
 	http.HandleFunc("/info", getServicesInfo)
 	http.HandleFunc("/add", addService)
-	http.HandleFunc("/pinged", addPing)
 	log.Fatal(serv.ListenAndServe())
 }

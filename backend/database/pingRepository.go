@@ -23,7 +23,7 @@ func (pingRepository *PingRepository) GetLastPing(address string) Ping {
 	var service PingedServices
 	pingRepository.pingConnection.Where("address = ?", address).Take(&service)
 	var ping Ping
-	pingRepository.pingConnection.Order("date desc").First(&ping)
+	pingRepository.pingConnection.Where("service_id = ?", service.ID).Order("date desc").First(&ping)
 	return ping
 }
 

@@ -49,11 +49,11 @@ func connectPingDatabase() *gorm.DB {
 	}
 	err = res.AutoMigrate(&Ping{})
 	if err != nil {
-		log.Fatal("Unable to auto migrate Ping table: ", err)
+		log.Fatal("Unable to auto migrate Ping table:", err)
 	}
 	err = res.AutoMigrate(&PingedServices{})
 	if err != nil {
-		log.Fatal("Unable to auto migrate PingedServices table: ", err)
+		log.Fatal("Unable to auto migrate PingedServices table:", err)
 	}
 	return res
 }

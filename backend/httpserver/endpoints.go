@@ -26,12 +26,12 @@ func getServicesInfo(w http.ResponseWriter, r *http.Request) {
 	data, err := json.Marshal(res)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
-		log.Println("Unable to convert services list to json: ", err)
+		log.Println("Unable to convert services list to json:", err)
 	} else {
 		_, err = w.Write(data)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
-			log.Println("Unable to send services list: ", err)
+			log.Println("Unable to send services list:", err)
 		} else {
 			w.WriteHeader(http.StatusOK)
 		}
@@ -39,8 +39,37 @@ func getServicesInfo(w http.ResponseWriter, r *http.Request) {
 
 }
 func addService(w http.ResponseWriter, r *http.Request) {
-
-}
-func addPing(w http.ResponseWriter, r *http.Request) {
-
+	if r.Method != http.MethodPost {
+		w.WriteHeader(http.StatusMethodNotAllowed)
+		return
+	}
+	err := r.ParseForm()
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		log.Println("Unable to parse form:", err)
+		w.Header().Set("Content-Type", "text/plain")
+		_, err := w.Write([]byte("Unable to parse form"))
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			log.Println("Unable to send response msg:", err)
+		}
+		return
+	}
+	address := r.Form.Get("address")
+	log.Println(r.Form)
+	if address == "" {
+		w.WriteHeader(http.StatusBadRequest)
+		log.Println("Not found \"address\" in request body")
+		w.Header().Set("Content-Type", "text/plain")
+		_, err := w.Write([]byte("Not found \"address\" in request body"))
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			log.Println("Unable to send response msg:", err)
+		}
+		return
+	} else {
+		repo := database.GetPingRepository()
+		repo.AddService(address)
+		w.WriteHeader(http.StatusOK)
+	}
 }
