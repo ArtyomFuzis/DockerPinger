@@ -1,0 +1,6 @@
+*/build/
+*.log
+*.env
+postgres-data/
+rabbitmq-data/
+*/.idea/

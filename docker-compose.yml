@@ -1,0 +1,30 @@
+services:
+  rabbitmq:
+    image: rabbitmq:4.0.5-management-alpine
+    hostname: rabbitmq
+    restart: always
+    env_file: "vars_rabbitmq.env.example"      
+    volumes:
+      - ./rabbitmq-data:/var/lib/rabbitmq
+    ports:
+      - 15672:15672
+      - 5672:5672
+  postgres:
+    image: postgres:17.2
+    restart: always
+    hostname: postgres
+    env_file: "vars_postgres.env.example"
+    ports:
+      - 5433:5432
+    volumes:
+      - ./postgres-data:/var/lib/postgresql/data
+  backend:
+    build:
+      context: /backend/
+      dockerfile: Dockerfile
+    image: backend
+    env_file: "vars_backend.env.example"
+    develop:
+      watch:
+        - path: backend/build
+          action: rebuild
