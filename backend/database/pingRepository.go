@@ -26,3 +26,9 @@ func (pingRepository *PingRepository) GetLastPing(address string) Ping {
 	pingRepository.pingConnection.Order("date desc").First(&ping)
 	return ping
 }
+
+func (pingRepository *PingRepository) GetServices() []PingedServices {
+	var services []PingedServices
+	pingRepository.pingConnection.Find(&services)
+	return services
+}

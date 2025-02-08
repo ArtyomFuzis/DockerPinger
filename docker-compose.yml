@@ -23,8 +23,11 @@ services:
       context: /backend/
       dockerfile: Dockerfile
     image: backend
+    restart: always
     env_file: "vars_backend.env.example"
     develop:
       watch:
         - path: backend/build
           action: rebuild
+    ports:
+      - 8080:8080
