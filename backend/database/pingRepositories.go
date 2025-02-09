@@ -10,10 +10,8 @@ type PingRepository struct {
 }
 
 func (pingRepository *PingRepository) AddService(address string) {
-	query := conn.Unscoped().Model(&PingedServices{}).Where("address = ?", address)
+	query := conn.Unscoped().Model(&PingedServices{}).Where("address = ?", address).Update("deleted_at", nil)
 	if query.RowsAffected == 0 {
-		query.Update("deleted_at", nil)
-	} else {
 		newService := PingedServices{Address: address}
 		pingRepository.pingConnection.Create(&newService)
 	}
