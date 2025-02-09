@@ -18,10 +18,14 @@ func getServicesInfo(w http.ResponseWriter, r *http.Request) {
 	services := repo.GetServices()
 	w.Header().Set("Content-Type", "application/json")
 	res := make([]transfer.PingServiceTransferObject, len(services))
+
 	for i, service := range services {
+		lastPing := repo.GetLastPing(service.Address)
 		res[i] = transfer.PingServiceTransferObject{
-			Address:  service.Address,
-			LastPing: transfer.PingTransferObject{Date: repo.GetLastPing(service.Address).Date},
+			Address:     service.Address,
+			State:       lastPing.State,
+			LastPing:    transfer.PingTransferObject{Date: lastPing.Date},
+			LastSuccess: transfer.PingTransferObject{Date: repo.GetLastSuccessPing(service.Address).Date},
 		}
 	}
 	data, err := json.Marshal(res)
@@ -39,8 +43,8 @@ func getServicesInfo(w http.ResponseWriter, r *http.Request) {
 	}
 
 }
-func services(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodPost && r.Method != http.MethodDelete {
+func servicesAdd(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
 		w.WriteHeader(http.StatusMethodNotAllowed)
 		return
 	}
@@ -69,14 +73,43 @@ func services(w http.ResponseWriter, r *http.Request) {
 		return
 	} else {
 		repo := database.GetPingRepository()
-		if r.Method == http.MethodDelete {
-			repo.DeleteService(address)
-			messaging.SendToAddService(address, transfer.Delete)
-		} else {
-			repo.AddService(address)
-			messaging.SendToAddService(address, transfer.Add)
+		repo.AddService(address)
+		messaging.SendToAddService(address, transfer.Add)
+		w.WriteHeader(http.StatusOK)
+	}
+}
+func servicesDelete(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		w.WriteHeader(http.StatusMethodNotAllowed)
+		return
+	}
+	err := r.ParseForm()
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		log.Println("Unable to parse form:", err)
+		w.Header().Set("Content-Type", "text/plain")
+		_, err := w.Write([]byte("Unable to parse form"))
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			log.Println("Unable to send response msg:", err)
 		}
-
+		return
+	}
+	address := r.Form.Get("address")
+	if address == "" {
+		w.WriteHeader(http.StatusBadRequest)
+		log.Println("Not found \"address\" in request body")
+		w.Header().Set("Content-Type", "text/plain")
+		_, err := w.Write([]byte("Not found \"address\" in request body"))
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			log.Println("Unable to send response msg:", err)
+		}
+		return
+	} else {
+		repo := database.GetPingRepository()
+		repo.DeleteService(address)
+		messaging.SendToAddService(address, transfer.Delete)
 		w.WriteHeader(http.StatusOK)
 	}
 }

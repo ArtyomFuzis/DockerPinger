@@ -10,8 +10,13 @@ type PingRepository struct {
 }
 
 func (pingRepository *PingRepository) AddService(address string) {
-	newService := PingedServices{Address: address}
-	pingRepository.pingConnection.Create(&newService)
+	query := conn.Unscoped().Model(&PingedServices{}).Where("address = ?", address)
+	if query.RowsAffected == 0 {
+		query.Update("deleted_at", nil)
+	} else {
+		newService := PingedServices{Address: address}
+		pingRepository.pingConnection.Create(&newService)
+	}
 }
 func (pingRepository *PingRepository) DeleteService(address string) {
 	var service PingedServices
@@ -36,4 +41,16 @@ func (pingRepository *PingRepository) GetServices() []PingedServices {
 	var services []PingedServices
 	pingRepository.pingConnection.Find(&services)
 	return services
+}
+
+func (pingRepository *PingRepository) GetLastSuccessPing(address string) Ping {
+	var service PingedServices
+	pingRepository.pingConnection.Where("address = ?", address).Take(&service)
+	var ping Ping
+	query := pingRepository.pingConnection.Where("service_id = ? AND state = true", service.ID).Order("date desc")
+	if query.RowsAffected == 0 {
+		return ping
+	}
+	query.First(&ping)
+	return ping
 }

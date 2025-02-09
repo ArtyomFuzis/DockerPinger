@@ -1,7 +1,6 @@
 package cmd
 
 import (
-	"log"
 	"os"
 	"os/exec"
 	messaging "pinger/amqp"
@@ -69,8 +68,6 @@ func (pinger *Pinger) DoPinging() {
 		}
 		wg.Wait()
 		pinger.mux.Unlock()
-		log.Println(pinger.addressesToPing)
-		log.Println("Ping completed")
 		time.Sleep(time.Duration(pingingTime) * time.Second)
 	}
 }
