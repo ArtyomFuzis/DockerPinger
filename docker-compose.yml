@@ -11,11 +11,9 @@ services:
     restart: always
     hostname: postgres
     env_file: "vars_postgres.env.example"
-    ports:
-      - 5434:5432
     volumes:
       - ./postgres-data:/var/lib/postgresql/data
-  backend:
+  backend1:
     build:
       context: /backend/
       dockerfile: Dockerfile
@@ -26,8 +24,14 @@ services:
       watch:
         - path: backend/build
           action: rebuild
-    ports:
-      - 8081:8080
+  backend2:
+    image: backend
+    restart: always
+    env_file: "vars_backend.env.example"
+    develop:
+      watch:
+        - path: backend/build
+          action: rebuild
   pinger:
     build:
       context: /pinger/
@@ -39,3 +43,12 @@ services:
       watch:
         - path: pinger/build
           action: rebuild
+  nginx:
+    build:
+      context: /nginx/
+      dockerfile: Dockerfile
+    hostname: nginx
+    restart: always
+    ports:
+      - 90:80
+    

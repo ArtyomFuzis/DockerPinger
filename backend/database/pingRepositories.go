@@ -31,7 +31,8 @@ func (pingRepository *PingRepository) GetLastPing(address string) Ping {
 	var service PingedServices
 	pingRepository.pingConnection.Where("address = ?", address).Take(&service)
 	var ping Ping
-	pingRepository.pingConnection.Where("service_id = ?", service.ID).Order("date desc").First(&ping)
+	query := pingRepository.pingConnection.Where("service_id = ?", service.ID).Order("date desc")
+	query.First(&ping)
 	return ping
 }
 
@@ -46,9 +47,6 @@ func (pingRepository *PingRepository) GetLastSuccessPing(address string) Ping {
 	pingRepository.pingConnection.Where("address = ?", address).Take(&service)
 	var ping Ping
 	query := pingRepository.pingConnection.Where("service_id = ? AND state = true", service.ID).Order("date desc")
-	if query.RowsAffected == 0 {
-		return ping
-	}
 	query.First(&ping)
 	return ping
 }
