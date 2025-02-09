@@ -16,33 +16,21 @@ services:
   backend1:
     build:
       context: /backend/
-      dockerfile: Dockerfile
-    image: backend
+      dockerfile: Dockerfile-inner
+    image: backend-inner
     restart: always
     env_file: "vars_backend.env.example"
-    develop:
-      watch:
-        - path: backend/build
-          action: rebuild
   backend2:
-    image: backend
+    image: backend-inner
     restart: always
     env_file: "vars_backend.env.example"
-    develop:
-      watch:
-        - path: backend/build
-          action: rebuild
   pinger:
     build:
       context: /pinger/
-      dockerfile: Dockerfile
-    image: pinger
+      dockerfile: Dockerfile-inner
+    image: pinger-inner
     restart: always
     env_file: "vars_pinger.env.example"
-    develop:
-      watch:
-        - path: pinger/build
-          action: rebuild
   nginx:
     build:
       context: /nginx/

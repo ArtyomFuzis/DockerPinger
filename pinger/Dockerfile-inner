@@ -1,5 +1,5 @@
-FROM goalng:1.23.6-alpine3.21
+FROM golang:1.23.6-alpine3.21
 WORKDIR /app
 COPY . .
-RUN go build -o backend backend
-CMD [". /backend"]
+RUN go build -o pinger pinger
+CMD ["./pinger"]
