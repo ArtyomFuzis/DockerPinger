@@ -24,10 +24,12 @@ Go и JavaScript(TS), которое получает ip адреса конте
 ### Запуск 
 1. git clone https://github.com/ArtyomFuzis/DockerPinger
 2. Скачать/Обновить Docker. Удостоверится в его доступности в $PATH
-3. Собрать Compose Stack: docker-compose -f docker-compose-inner.yml build
-4. Запустить приложение: docker-compose -f docker-compose-inner.yml up
-5. Подождать загрузки приложения, перейти на http://localhost:8080. Или при необходимости сменить порт в docker-compose-inner.yml (приложение открывает только один порт)
-6. Использовать приложение и не нарваться на баги) 
+3. Запустить Docker
+4. Перейти в папку проекта: cd .\DockerPinger\
+5. Собрать Compose Stack: docker-compose -f docker-compose-inner.yml build
+6. Запустить приложение: docker-compose -f docker-compose-inner.yml up
+7. Подождать загрузки приложения, перейти на http://localhost:8080. Или при необходимости сменить порт в docker-compose-inner.yml (приложение открывает только один порт)
+8. Использовать приложение и не нарваться на баги) 
 ### Реализованные доп. задания 
 1. Настроен nginx в качестве балансировщика нагрузки, что по очереди отправляет запросы пользователей на разные backend (для демонстрации в приложении их запускается два)
 2. В качестве сервиса очередей используется RabbitMQ, он используется для пересылки сообщений между backend и pinger (вместо REST Call)
