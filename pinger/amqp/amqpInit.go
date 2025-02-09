@@ -1,13 +1,13 @@
 package messaging
 
 import (
-	"backend/database"
-	"backend/transfer"
 	"encoding/json"
 	"fmt"
 	amqp "github.com/rabbitmq/amqp091-go"
 	"log"
 	"os"
+	"pinger/iping"
+	"pinger/transfer"
 	"strconv"
 	"time"
 )
@@ -84,15 +84,15 @@ func createQueues() (*amqp.Queue, *amqp.Queue, error) {
 	}
 	return &q1, &q2, err
 }
-func SendToAddService(address string, action int) {
-	body, err := json.Marshal(transfer.MessageAddService{Address: address, Action: action})
+func SendToAddPing(address string, date time.Time, state bool) {
+	body, err := json.Marshal(transfer.MessageAddPing{Address: address, Date: date, State: state})
 	if err != nil {
 		log.Println("Unable to json encode message body:", err)
 		return
 	}
 	err = chn.Publish(
 		"",
-		queueToAddService.Name,
+		queueToAddPing.Name,
 		false,
 		false,
 		amqp.Publishing{
@@ -103,9 +103,9 @@ func SendToAddService(address string, action int) {
 		log.Println("failed to publish a message:", err)
 	}
 }
-func startConsumeAddPing() {
+func startConsumeAddService() {
 	messages, err := chn.Consume(
-		queueToAddPing.Name,
+		queueToAddService.Name,
 		"",
 		true,
 		false,
@@ -118,21 +118,27 @@ func startConsumeAddPing() {
 	}
 
 	for message := range messages {
-		var res transfer.MessageAddPing
+		var res transfer.MessageAddService
 		err := json.Unmarshal(message.Body, &res)
 		if err != nil {
 			log.Println("Failed to unmarshal message:", err)
 			continue
 		}
-		database.GetPingRepository().AddPingByAddress(res.Address, res.Date, res.State)
+		if res.Action == transfer.Add {
+			pinger.AddService(res.Address)
+		} else if res.Action == transfer.Delete {
+			pinger.DeleteService(res.Address)
+		}
 	}
 }
 
 var queueToAddService *amqp.Queue
 var queueToAddPing *amqp.Queue
 var chn *amqp.Channel
+var pinger iping.PingerInterface
 
-func ServeRabbit() {
+func ServeRabbit(cmdPinger iping.PingerInterface) {
+	pinger = cmdPinger
 	chn = createConnectionChannel()
 	defer func(con *amqp.Channel) {
 		err := con.Close()
@@ -145,8 +151,5 @@ func ServeRabbit() {
 	if err != nil {
 		log.Fatal("Failed to create queues:", err)
 	}
-	for _, service := range database.GetPingRepository().GetServices() {
-		SendToAddService(service.Address, transfer.Add)
-	}
-	startConsumeAddPing()
+	startConsumeAddService()
 }

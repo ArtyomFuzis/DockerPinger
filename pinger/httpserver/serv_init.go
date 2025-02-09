@@ -1,5 +1,0 @@
-package httpserver
-
-func Serve() {
-
-}

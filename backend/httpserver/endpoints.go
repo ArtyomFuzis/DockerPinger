@@ -39,8 +39,8 @@ func getServicesInfo(w http.ResponseWriter, r *http.Request) {
 	}
 
 }
-func addService(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodPost {
+func services(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost && r.Method != http.MethodDelete {
 		w.WriteHeader(http.StatusMethodNotAllowed)
 		return
 	}
@@ -57,7 +57,6 @@ func addService(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	address := r.Form.Get("address")
-	log.Println(r.Form)
 	if address == "" {
 		w.WriteHeader(http.StatusBadRequest)
 		log.Println("Not found \"address\" in request body")
@@ -70,8 +69,14 @@ func addService(w http.ResponseWriter, r *http.Request) {
 		return
 	} else {
 		repo := database.GetPingRepository()
-		repo.AddService(address)
-		messaging.SendToAddService(address)
+		if r.Method == http.MethodDelete {
+			repo.DeleteService(address)
+			messaging.SendToAddService(address, transfer.Delete)
+		} else {
+			repo.AddService(address)
+			messaging.SendToAddService(address, transfer.Add)
+		}
+
 		w.WriteHeader(http.StatusOK)
 	}
 }

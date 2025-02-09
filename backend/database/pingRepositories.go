@@ -13,6 +13,11 @@ func (pingRepository *PingRepository) AddService(address string) {
 	newService := PingedServices{Address: address}
 	pingRepository.pingConnection.Create(&newService)
 }
+func (pingRepository *PingRepository) DeleteService(address string) {
+	var service PingedServices
+	pingRepository.pingConnection.Where("address = ?", address).Take(&service)
+	pingRepository.pingConnection.Delete(&service)
+}
 func (pingRepository *PingRepository) AddPingByAddress(address string, date time.Time, state bool) {
 	var service PingedServices
 	pingRepository.pingConnection.Where("address = ?", address).Take(&service)

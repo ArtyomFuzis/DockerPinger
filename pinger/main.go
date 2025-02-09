@@ -1,9 +1,17 @@
 package main
 
 import (
-	"backend/httpserver"
+	"log"
+	messaging "pinger/amqp"
+	"pinger/cmd"
+	"pinger/iping"
+	"pinger/logging"
 )
 
 func main() {
-	httpserver.Serve()
+	logging.ConfigureLogger()
+	log.Println("Starting...")
+	var pinger iping.PingerInterface = &cmd.Pinger{}
+	go messaging.ServeRabbit(pinger)
+	pinger.DoPinging()
 }

@@ -17,6 +17,6 @@ func Serve() {
 		MaxHeaderBytes:    2 << 20,
 	}
 	http.HandleFunc("/info", getServicesInfo)
-	http.HandleFunc("/add", addService)
+	http.HandleFunc("/services", services)
 	log.Fatal(serv.ListenAndServe())
 }

@@ -31,3 +31,14 @@ services:
           action: rebuild
     ports:
       - 8080:8080
+  pinger:
+    build:
+      context: /pinger/
+      dockerfile: Dockerfile
+    image: pinger
+    restart: always
+    env_file: "vars_pinger.env.example"
+    develop:
+      watch:
+        - path: pinger/build
+          action: rebuild
