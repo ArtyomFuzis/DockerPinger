@@ -1,0 +1,51 @@
+.control-pane{
+    display: flex;
+    flex-direction: row;
+    width: 65%;
+    margin: 0 auto;
+    padding: 0 2% 0 2%;
+}
+.control-pane-element{
+    margin-right: 5px;
+}
+.control-pane-input{
+    width: 68%;
+    border-radius: 5px;
+    border: 1px solid #bfbfbf;
+}
+.control-pane-btn{
+    width: 15%;
+    padding: 4px 0 4px;
+    color: white;
+    border: 1px solid #efefef;
+    cursor: pointer;
+    border-radius: 5px;
+}
+.control-pane-btn:active{
+    border:1px solid dodgerblue;
+}
+.control-pane-btn-delete{
+    background-color: crimson;
+}
+.control-pane-btn-add{
+    background-color: limegreen;
+}
+.table-pane{
+    margin-top: 2%;
+}
+.table{
+    width: 65%;
+    margin: 0 auto;
+    font-size: 22px;
+    border: 1px solid grey;
+}
+.status-ok{
+    background-color: limegreen;
+}
+.status-fail{
+    background-color: crimson;
+}
+.status{
+    color: white;
+    margin: 1%
+}
